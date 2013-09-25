@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <string name="app_name">shadowsocks</string>
+
+  <!-- function category -->
+  <string name="function_cat">Service Controller</string>
+  <string name="service_controller">Proxy Switch</string>
+  <string name="service_summary">Enable / Disable Proxy</string>
+
+  <!-- proxy category -->
+  <string name="proxy_cat">Server Settings</string>
+  <string name="proxy">Server</string>
+  <string name="proxy_summary">Hostname or IP Address of your Shadowsocks server</string>
+  <string name="remote_port">Remote Port</string>
+  <string name="remote_port_summary">Port number of your Shadowsocks server</string>
+  <string name="port">Local Port</string>
+  <string name="port_summary">Port number of your Shadowsocks client</string>
+  <string name="sitekey">Password</string>
+  <string name="sitekey_summary">Password of your Shadowsocks server</string>
+  <string name="enc_method">Encrypt Method</string>
+
+  <!-- feature category -->
+  <string name="feature_cat">Feature Settings</string>
+  <string name="http_proxy">HTTP Proxy</string>
+  <string name="http_proxy_summary">Local HTTP Proxy</string>
+  <string name="dns_proxy">DNS Proxy</string>
+  <string name="dns_proxy_summary">Redirect DNS queries to remote server.</string>
+  <string name="auto_set_gfwlist">CHN Route</string>
+  <string name="auto_set_gfwlist_summary">Bypass all sites located in China
+  </string>
+  <string name="auto_set_proxy">Global Proxy</string>
+  <string name="auto_set_proxy_summary">Set up system wide proxy
+  </string>
+  <string name="proxied_apps">Individual Proxy</string>
+  <string name="proxied_apps_summary">Set individual proxy for apps
+  </string>
+  <string name="proxied_help">Individual Proxy</string>
+  <string name="bypass_apps">Bypass Mode</string>
+  <string name="bypass_apps_summary">Enable this option to bypass selected apps</string>
+  <string name="auto_connect">Auto Connect</string>
+  <string name="auto_connect_summary">Enable Shadowsocks on startup</string>
+  <string name="traffic_stat">Traffic Stats</string>
+  <string name="traffic_stat_summary">Show traffic stats on notification bar</string>
+
+  <!-- notification category -->
+  <string name="forward_success">Shadowsocks started.</string>
+  <string name="service_running">Running in the background.</string>
+  <string name="service_status" formatted="false">Current Speed: %d KB/s</string>
+  <string name="forward_fail">Shadowsocks failed to start.</string>
+  <string name="service_stopped">Shadowsocks stopped.</string>
+  <string name="forward_stop">Shadowsocks stopped.</string>
+  <string name="service_failed">Please check your network status and try again.</string>
+  <string name="stop">Stop the service</string>
+  <string name="vpn_status">You can only disable the VPN service through the notification bar.</string>
+  <string name="vpn_error">Unable to start VPN service: "%s". It seems a compatibility issue on your device. Please consider to use ROOT mode instead.</string>
+
+  <!-- alert category -->
+  <string name="ok_iknow">OK</string>
+  <string name="port_alert">The port number should be greater than 1024</string>
+  <string name="port_empty">Port should not be empty</string>
+  <string name="proxy_empty">Proxy should not be empty</string>
+  <string name="crash_alert">An unexpected exit detected, the context has been reset.
+  </string>
+  <string name="connecting">Connecting…</string>
+  <string name="initializing">Initializing…</string>
+  <string name="recovering">Reseting…</string>
+  <string name="loading">Loading app list…</string>
+
+  <!-- menu category -->
+  <string name="recovery">Reset</string>
+  <string name="about">About</string>
+  <string name="about_title">Shadowsocks %s</string>
+  <string name="flush_dnscache">Flush DNS Cache</string>
+  <string name="flushing">Flushing</string>
+
+</resources>
