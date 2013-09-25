@@ -16,6 +16,9 @@ gen_*
 *.o
 local.sbt
 
+proguard_cache
+.DS_Store
+
 #Intellij IDEA
 *.iml
 *.ipr
