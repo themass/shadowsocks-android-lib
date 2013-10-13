@@ -64,7 +64,7 @@ object ShadowVpnService {
 class ShadowVpnService extends VpnService {
 
   val TAG = "ShadowVpnService"
-  val BASE = "/data/data/com.github.shadowsocks/"
+  val BASE = "/data/data/com.biganiseed.reindeer/"
 
   val MSG_CONNECT_FINISH = 1
   val MSG_CONNECT_SUCCESS = 2
@@ -143,7 +143,7 @@ class ShadowVpnService extends VpnService {
       BASE +
       "shadowsocks.pid")
       .format(config.proxy, config.remotePort, config.localPort, config.sitekey, config.encMethod)
-    if (BuildConfig.DEBUG) Log.d(TAG, cmd)
+    if (SSBuildConfig.DEBUG) Log.d(TAG, cmd)
     System.exec(cmd)
   }
 
@@ -308,7 +308,7 @@ class ShadowVpnService extends VpnService {
       + "--loglevel 3 "
       + "--pid %stun2socks.pid")
       .format(PRIVATE_VLAN.format("2"), PRIVATE_VLAN.format("1"), config.localPort, fd, VPN_MTU, BASE)
-    if (BuildConfig.DEBUG) Log.d(TAG, cmd)
+    if (SSBuildConfig.DEBUG) Log.d(TAG, cmd)
     System.exec(cmd)
   }
 
@@ -396,15 +396,15 @@ class ShadowVpnService extends VpnService {
   def killProcesses() {
     val sb = new StringBuilder
     if (!waitForProcess("shadowsocks")) {
-      sb ++= "kill -9 `cat /data/data/com.github.shadowsocks/shadowsocks.pid`" ++= "\n"
+      sb ++= "kill -9 `cat /data/data/com.biganiseed.reindeer/shadowsocks.pid`" ++= "\n"
       sb ++= "killall -9 shadowsocks" ++= "\n"
     }
     if (!waitForProcess("tun2socks")) {
-      sb ++= "kill -9 `cat /data/data/com.github.shadowsocks/tun2socks.pid`" ++= "\n"
+      sb ++= "kill -9 `cat /data/data/com.biganiseed.reindeer/tun2socks.pid`" ++= "\n"
       sb ++= "killall -9 tun2socks" ++= "\n"
     }
     if (!waitForProcess("pdnsd")) {
-      sb ++= "kill -9 `cat /data/data/com.github.shadowsocks/pdnsd.pid`" ++= "\n"
+      sb ++= "kill -9 `cat /data/data/com.biganiseed.reindeer/pdnsd.pid`" ++= "\n"
       sb ++= "killall -9 pdnsd" ++= "\n"
     }
     Utils.runCommand(sb.toString())

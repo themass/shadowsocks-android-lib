@@ -73,7 +73,7 @@ object ShadowsocksService {
 class ShadowsocksService extends Service {
 
   val TAG = "ShadowsocksService"
-  val BASE = "/data/data/com.github.shadowsocks/"
+  val BASE = "/data/data/com.biganiseed.reindeer/"
 
   val CMD_IPTABLES_RETURN = " -t nat -A OUTPUT -p tcp -d 0.0.0.0 -j RETURN\n"
   val CMD_IPTABLES_REDIRECT_ADD_SOCKS = " -t nat -A OUTPUT -p tcp " + "-j REDIRECT --to 8123\n"
@@ -161,7 +161,7 @@ class ShadowsocksService extends Service {
       BASE + "shadowsocks.pid")
       .format(config.proxy, config.remotePort, config.localPort, config.sitekey,
       config.encMethod)
-    if (BuildConfig.DEBUG) Log.d(TAG, cmd)
+    if (SSBuildConfig.DEBUG) Log.d(TAG, cmd)
     System.exec(cmd)
   }
 
@@ -453,18 +453,18 @@ class ShadowsocksService extends Service {
 
     val sb = new StringBuilder
 
-    sb ++= "kill -9 `cat /data/data/com.github.shadowsocks/redsocks.pid`" ++= "\n"
+    sb ++= "kill -9 `cat /data/data/com.biganiseed.reindeer/redsocks.pid`" ++= "\n"
     sb ++= "killall -9 redsocks" ++= "\n"
     Utils.runRootCommand(sb.toString())
 
     sb.clear()
 
     if (!waitForProcess("pdnsd")) {
-      sb ++= "kill -9 `cat /data/data/com.github.shadowsocks/pdnsd.pid`" ++= "\n"
+      sb ++= "kill -9 `cat /data/data/com.biganiseed.reindeer/pdnsd.pid`" ++= "\n"
       sb ++= "killall -9 pdnsd" ++= "\n"
     }
     if (!waitForProcess("shadowsocks")) {
-      sb ++= "kill -9 `cat /data/data/com.github.shadowsocks/shadowsocks.pid`" ++= "\n"
+      sb ++= "kill -9 `cat /data/data/com.biganiseed.reindeer/shadowsocks.pid`" ++= "\n"
       sb ++= "killall -9 shadowsocks" ++= "\n"
     }
     Utils.runCommand(sb.toString())

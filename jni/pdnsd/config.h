@@ -104,7 +104,7 @@
  * default: native; others: gdbm */
 #define CACHE_DBM DBM_NATIVE
 
-#define CACHEDIR "/data/data/com.github.shadowsocks"
+#define CACHEDIR "/data/data/com.biganiseed.reindeer"
 
 #define TEMPDIR "/tmp";
 

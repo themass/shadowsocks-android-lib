@@ -75,7 +75,7 @@ object Config {
     """
       |global {
       | perm_cache = 2048;
-      | cache_dir = "/data/data/com.github.shadowsocks";
+      | cache_dir = "/data/data/com.biganiseed.reindeer";
       | server_ip = %s;
       | server_port = 8153;
       | query_method = tcp_only;
@@ -84,7 +84,7 @@ object Config {
       | max_ttl = 1w;
       | timeout = 10;
       | daemon = on;
-      | pid_file = "/data/data/com.github.shadowsocks/pdnsd.pid";
+      | pid_file = "/data/data/com.biganiseed.reindeer/pdnsd.pid";
       |}
       |
       |server {
@@ -254,7 +254,7 @@ object Utils {
   val DEFAULT_SHELL: String = "/system/bin/sh"
   val DEFAULT_ROOT: String = "/system/bin/su"
   val ALTERNATIVE_ROOT: String = "/system/xbin/su"
-  val DEFAULT_IPTABLES: String = "/data/data/com.github.shadowsocks/iptables"
+  val DEFAULT_IPTABLES: String = "/data/data/com.biganiseed.reindeer/iptables"
   val ALTERNATIVE_IPTABLES: String = "/system/bin/iptables"
   val TIME_OUT: Int = -99
   var initialized: Boolean = false
@@ -410,7 +410,7 @@ import scala.collection.JavaConversions._
           if (!addr.isLoopbackAddress && !addr.isLinkLocalAddress) {
             val sAddr = addr.getHostAddress.toUpperCase
             if (InetAddressUtils.isIPv6Address(sAddr)) {
-              if (BuildConfig.DEBUG) Log.d(TAG, "IPv6 address detected")
+              if (SSBuildConfig.DEBUG) Log.d(TAG, "IPv6 address detected")
               return true
             }
           }
@@ -597,7 +597,7 @@ import scala.collection.JavaConversions._
   }
 
   def runCommand(command: String, timeout: Int): Boolean = {
-    if (BuildConfig.DEBUG) Log.d(TAG, command)
+    if (SSBuildConfig.DEBUG) Log.d(TAG, command)
     runScript(command, null, timeout, asroot = false)
     true
   }
@@ -611,7 +611,7 @@ import scala.collection.JavaConversions._
       Log.e(TAG, "Cannot get ROOT permission: " + root_shell)
       return false
     }
-    if (BuildConfig.DEBUG) Log.d(TAG, command)
+    if (SSBuildConfig.DEBUG) Log.d(TAG, command)
     runScript(command, null, timeout, asroot = true)
     true
   }

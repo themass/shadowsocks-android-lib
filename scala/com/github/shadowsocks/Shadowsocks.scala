@@ -241,8 +241,10 @@ class Shadowsocks
         Log.e(Shadowsocks.TAG, e.getMessage)
       }
     }
-    if (files != null) {
-      for (file <- files) {
+ Log.d("reindeer", path);
+   if (files != null) {
+Log.d("reindeer", "4.5");
+       for (file <- files) {
         var in: InputStream = null
         var out: OutputStream = null
         try {
@@ -251,8 +253,10 @@ class Shadowsocks
           } else {
             in = assetManager.open(file)
           }
-          out = new FileOutputStream("/data/data/com.github.shadowsocks/" + file)
+          out = new FileOutputStream("/data/data/com.biganiseed.reindeer/" + file)
+ Log.d("reindeer", file);
           copyFile(in, out)
+ Log.d("reindeer", "5");
           in.close()
           in = null
           out.flush()
@@ -261,6 +265,7 @@ class Shadowsocks
         } catch {
           case ex: Exception => {
             Log.e(Shadowsocks.TAG, ex.getMessage)
+Log.e("reindeer", ex.getMessage)
           }
         }
       }
@@ -288,19 +293,19 @@ class Shadowsocks
   private def crash_recovery() {
     val sb = new StringBuilder
 
-    sb.append("kill -9 `cat /data/data/com.github.shadowsocks/pdnsd.pid`").append("\n")
-    sb.append("kill -9 `cat /data/data/com.github.shadowsocks/shadowsocks.pid`").append("\n")
-    sb.append("kill -9 `cat /data/data/com.github.shadowsocks/tun2socks.pid`").append("\n")
+    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/pdnsd.pid`").append("\n")
+    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/shadowsocks.pid`").append("\n")
+    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/tun2socks.pid`").append("\n")
     sb.append("killall -9 pdnsd").append("\n")
     sb.append("killall -9 shadowsocks").append("\n")
     sb.append("killall -9 tun2socks").append("\n")
-    sb.append("rm /data/data/com.github.shadowsocks/pdnsd.conf").append("\n")
+    sb.append("rm /data/data/com.biganiseed.reindeer/pdnsd.conf").append("\n")
     Utils.runCommand(sb.toString())
 
     sb.clear()
-    sb.append("kill -9 `cat /data/data/com.github.shadowsocks/redsocks.pid`").append("\n")
+    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/redsocks.pid`").append("\n")
     sb.append("killall -9 redsocks").append("\n")
-    sb.append("rm /data/data/com.github.shadowsocks/redsocks.conf").append("\n")
+    sb.append("rm /data/data/com.biganiseed.reindeer/redsocks.conf").append("\n")
     sb.append(Utils.getIptables).append(" -t nat -F OUTPUT").append("\n")
     Utils.runRootCommand(sb.toString())
   }
@@ -415,9 +420,12 @@ class Shadowsocks
         progressDialog = ProgressDialog.show(this, "", getString(R.string.initializing), true, true)
       }
       spawn {
+Log.d("reindeer", "1");
         status.edit().putBoolean(Key.isRoot, Utils.getRoot).commit()
+Log.d("reindeer", "2");
         if (!status.getBoolean(getVersionName, false)) {
           status.edit.putBoolean(getVersionName, true).apply()
+Log.d("reindeer", "3");
           reset()
         }
         handler.sendEmptyMessage(MSG_INITIAL_FINISH)
@@ -554,12 +562,13 @@ class Shadowsocks
 
   def reset() {
     crash_recovery()
+Log.d("reindeer", "4");
     copyAssets(Utils.getABI)
-    Utils.runCommand("chmod 755 /data/data/com.github.shadowsocks/iptables\n"
-      + "chmod 755 /data/data/com.github.shadowsocks/redsocks\n"
-      + "chmod 755 /data/data/com.github.shadowsocks/pdnsd\n"
-      + "chmod 755 /data/data/com.github.shadowsocks/shadowsocks\n"
-      + "chmod 755 /data/data/com.github.shadowsocks/tun2socks\n")
+    Utils.runCommand("chmod 755 /data/data/com.biganiseed.reindeer/iptables\n"
+      + "chmod 755 /data/data/com.biganiseed.reindeer/redsocks\n"
+      + "chmod 755 /data/data/com.biganiseed.reindeer/pdnsd\n"
+      + "chmod 755 /data/data/com.biganiseed.reindeer/shadowsocks\n"
+      + "chmod 755 /data/data/com.biganiseed.reindeer/tun2socks\n")
   }
 
   private def recovery() {

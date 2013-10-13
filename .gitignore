@@ -1,3 +1,9 @@
+proguard_cache
+.DS_Store
+.cache
+libs/scala_library.min.jar
+
+
 classes
 bin
 gen
@@ -16,8 +22,8 @@ gen_*
 *.o
 local.sbt
 
-proguard_cache
-.DS_Store
+
+
 
 #Intellij IDEA
 *.iml
@@ -30,3 +36,5 @@ out/
 src/main/libs
 src/main/assets/arm
 src/main/assets/x86
+
+
