@@ -231,57 +231,57 @@ class Shadowsocks
     }
   }
 
-  private def copyAssets(path: String) {
-    val assetManager: AssetManager = getAssets
-    var files: Array[String] = null
-    try {
-      files = assetManager.list(path)
-    } catch {
-      case e: IOException => {
-        Log.e(Shadowsocks.TAG, e.getMessage)
-      }
-    }
- Log.d("reindeer", path);
-   if (files != null) {
-Log.d("reindeer", "4.5");
-       for (file <- files) {
-        var in: InputStream = null
-        var out: OutputStream = null
-        try {
-          if (path.length > 0) {
-            in = assetManager.open(path + "/" + file)
-          } else {
-            in = assetManager.open(file)
-          }
-          out = new FileOutputStream("/data/data/com.biganiseed.reindeer/" + file)
- Log.d("reindeer", file);
-          copyFile(in, out)
- Log.d("reindeer", "5");
-          in.close()
-          in = null
-          out.flush()
-          out.close()
-          out = null
-        } catch {
-          case ex: Exception => {
-            Log.e(Shadowsocks.TAG, ex.getMessage)
-Log.e("reindeer", ex.getMessage)
-          }
-        }
-      }
-    }
-  }
+//  private def copyAssets(path: String) {
+//    val assetManager: AssetManager = getAssets
+//    var files: Array[String] = null
+//    try {
+//      files = assetManager.list(path)
+//    } catch {
+//      case e: IOException => {
+//        Log.e(Shadowsocks.TAG, e.getMessage)
+//      }
+//    }
+// Log.d("reindeer", path);
+//   if (files != null) {
+//Log.d("reindeer", "4.5");
+//       for (file <- files) {
+//        var in: InputStream = null
+//        var out: OutputStream = null
+//        try {
+//          if (path.length > 0) {
+//            in = assetManager.open(path + "/" + file)
+//          } else {
+//            in = assetManager.open(file)
+//          }
+//          out = new FileOutputStream("/data/data/com.biganiseed.reindeer/" + file)
+// Log.d("reindeer", file);
+//          copyFile(in, out)
+// Log.d("reindeer", "5");
+//          in.close()
+//          in = null
+//          out.flush()
+//          out.close()
+//          out = null
+//        } catch {
+//          case ex: Exception => {
+//            Log.e(Shadowsocks.TAG, ex.getMessage)
+//Log.e("reindeer", ex.getMessage)
+//          }
+//        }
+//      }
+//    }
+//  }
 
-  private def copyFile(in: InputStream, out: OutputStream) {
-    val buffer: Array[Byte] = new Array[Byte](1024)
-    var read: Int = 0
-    while ( {
-      read = in.read(buffer)
-      read
-    } != -1) {
-      out.write(buffer, 0, read)
-    }
-  }
+//  private def copyFile(in: InputStream, out: OutputStream) {
+//    val buffer: Array[Byte] = new Array[Byte](1024)
+//    var read: Int = 0
+//    while ( {
+//      read = in.read(buffer)
+//      read
+//    } != -1) {
+//      out.write(buffer, 0, read)
+//    }
+//  }
 
   def onSharedPreferenceChanged(prefs: SharedPreferences, key: String) {
     if (key == Key.isGlobalProxy) {
@@ -290,25 +290,25 @@ Log.e("reindeer", ex.getMessage)
     }
   }
 
-  private def crash_recovery() {
-    val sb = new StringBuilder
-
-    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/pdnsd.pid`").append("\n")
-    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/shadowsocks.pid`").append("\n")
-    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/tun2socks.pid`").append("\n")
-    sb.append("killall -9 pdnsd").append("\n")
-    sb.append("killall -9 shadowsocks").append("\n")
-    sb.append("killall -9 tun2socks").append("\n")
-    sb.append("rm /data/data/com.biganiseed.reindeer/pdnsd.conf").append("\n")
-    Utils.runCommand(sb.toString())
-
-    sb.clear()
-    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/redsocks.pid`").append("\n")
-    sb.append("killall -9 redsocks").append("\n")
-    sb.append("rm /data/data/com.biganiseed.reindeer/redsocks.conf").append("\n")
-    sb.append(Utils.getIptables).append(" -t nat -F OUTPUT").append("\n")
-    Utils.runRootCommand(sb.toString())
-  }
+//  private def crash_recovery() {
+//    val sb = new StringBuilder
+//
+//    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/pdnsd.pid`").append("\n")
+//    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/shadowsocks.pid`").append("\n")
+//    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/tun2socks.pid`").append("\n")
+//    sb.append("killall -9 pdnsd").append("\n")
+//    sb.append("killall -9 shadowsocks").append("\n")
+//    sb.append("killall -9 tun2socks").append("\n")
+//    sb.append("rm /data/data/com.biganiseed.reindeer/pdnsd.conf").append("\n")
+//    Utils.runCommand(sb.toString())
+//
+//    sb.clear()
+//    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/redsocks.pid`").append("\n")
+//    sb.append("killall -9 redsocks").append("\n")
+//    sb.append("rm /data/data/com.biganiseed.reindeer/redsocks.conf").append("\n")
+//    sb.append(Utils.getIptables).append(" -t nat -F OUTPUT").append("\n")
+//    Utils.runRootCommand(sb.toString())
+//  }
 
   private def getVersionName: String = {
     var version: String = null
@@ -426,7 +426,7 @@ Log.d("reindeer", "2");
         if (!status.getBoolean(getVersionName, false)) {
           status.edit.putBoolean(getVersionName, true).apply()
 Log.d("reindeer", "3");
-          reset()
+          Utils.reset(this)
         }
         handler.sendEmptyMessage(MSG_INITIAL_FINISH)
       }
@@ -498,7 +498,7 @@ Log.d("reindeer", "3");
             .setBackgroundColorValue(Style.holoBlueLight)
             .setDuration(Style.DURATION_INFINITE)
             .build()
-          switchButton.setEnabled(false)
+//          switchButton.setEnabled(false)
           Crouton.makeText(Shadowsocks.this, R.string.vpn_status, style).show()
         }
         setPreferenceEnabled(enabled = false)
@@ -510,7 +510,7 @@ Log.d("reindeer", "3");
         setPreferenceEnabled(enabled = true)
         if (status.getBoolean(Key.isRunning, false)) {
           spawn {
-            crash_recovery()
+            Utils.crash_recovery()
             handler.sendEmptyMessage(MSG_CRASH_RECOVER)
           }
         }
@@ -560,16 +560,16 @@ Log.d("reindeer", "3");
     new BackupManager(this).dataChanged()
   }
 
-  def reset() {
-    crash_recovery()
-Log.d("reindeer", "4");
-    copyAssets(Utils.getABI)
-    Utils.runCommand("chmod 755 /data/data/com.biganiseed.reindeer/iptables\n"
-      + "chmod 755 /data/data/com.biganiseed.reindeer/redsocks\n"
-      + "chmod 755 /data/data/com.biganiseed.reindeer/pdnsd\n"
-      + "chmod 755 /data/data/com.biganiseed.reindeer/shadowsocks\n"
-      + "chmod 755 /data/data/com.biganiseed.reindeer/tun2socks\n")
-  }
+//  def reset() {
+//    crash_recovery()
+//Log.d("reindeer", "4");
+//    copyAssets(Utils.getABI)
+//    Utils.runCommand("chmod 755 /data/data/com.biganiseed.reindeer/iptables\n"
+//      + "chmod 755 /data/data/com.biganiseed.reindeer/redsocks\n"
+//      + "chmod 755 /data/data/com.biganiseed.reindeer/pdnsd\n"
+//      + "chmod 755 /data/data/com.biganiseed.reindeer/shadowsocks\n"
+//      + "chmod 755 /data/data/com.biganiseed.reindeer/tun2socks\n")
+//  }
 
   private def recovery() {
     clearDialog()
@@ -581,7 +581,7 @@ Log.d("reindeer", "4");
     }
     serviceStop()
     spawn {
-      reset()
+      Utils.reset(this)
       h.sendEmptyMessage(0)
     }
   }
@@ -661,7 +661,7 @@ Log.d("reindeer", "4");
         .setDuration(Style.DURATION_INFINITE)
         .build()
       Crouton.makeText(Shadowsocks.this, R.string.vpn_status, style).show()
-      switchButton.setEnabled(false)
+//      switchButton.setEnabled(false)
     } else {
       if (ShadowsocksService.isServiceStarted(this)) return false
       val intent: Intent = new Intent(this, classOf[ShadowsocksService])

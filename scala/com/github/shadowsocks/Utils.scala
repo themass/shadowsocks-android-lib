@@ -55,6 +55,8 @@ import android.app.ActivityManager
 import android.os.Build
 import android.provider.Settings
 
+import android.content.res.AssetManager
+
 object Config {
   val SHADOWSOCKS = "{\"server\": [%s], \"server_port\": %d, \"local_port\": %d, \"password\": %s, \"timeout\": %d}"
   val REDSOCKS = "base {" +
@@ -748,6 +750,89 @@ import scala.collection.JavaConversions._
         }
       }
     }
+  }
+  
+  def copyAssets(context: Context, path: String) {
+    val assetManager: AssetManager = context.getAssets
+    var files: Array[String] = null
+    try {
+      files = assetManager.list(path)
+    } catch {
+      case e: IOException => {
+        Log.e(Shadowsocks.TAG, e.getMessage)
+      }
+    }
+ Log.d("reindeer", path);
+   if (files != null) {
+Log.d("reindeer", "4.5");
+       for (file <- files) {
+        var in: InputStream = null
+        var out: OutputStream = null
+        try {
+          if (path.length > 0) {
+            in = assetManager.open(path + "/" + file)
+          } else {
+            in = assetManager.open(file)
+          }
+          out = new FileOutputStream("/data/data/com.biganiseed.reindeer/" + file)
+ Log.d("reindeer", file);
+          copyFile(in, out)
+ Log.d("reindeer", "5");
+          in.close()
+          in = null
+          out.flush()
+          out.close()
+          out = null
+        } catch {
+          case ex: Exception => {
+            Log.e(Shadowsocks.TAG, ex.getMessage)
+Log.e("reindeer", ex.getMessage)
+          }
+        }
+      }
+    }
+  }
+
+  private def copyFile(in: InputStream, out: OutputStream) {
+    val buffer: Array[Byte] = new Array[Byte](1024)
+    var read: Int = 0
+    while ( {
+      read = in.read(buffer)
+      read
+    } != -1) {
+      out.write(buffer, 0, read)
+    }
+  }
+
+  def crash_recovery() {
+    val sb = new StringBuilder
+
+    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/pdnsd.pid`").append("\n")
+    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/shadowsocks.pid`").append("\n")
+    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/tun2socks.pid`").append("\n")
+    sb.append("killall -9 pdnsd").append("\n")
+    sb.append("killall -9 shadowsocks").append("\n")
+    sb.append("killall -9 tun2socks").append("\n")
+    sb.append("rm /data/data/com.biganiseed.reindeer/pdnsd.conf").append("\n")
+    Utils.runCommand(sb.toString())
+
+//    sb.clear()
+//    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/redsocks.pid`").append("\n")
+//    sb.append("killall -9 redsocks").append("\n")
+//    sb.append("rm /data/data/com.biganiseed.reindeer/redsocks.conf").append("\n")
+//    sb.append(Utils.getIptables).append(" -t nat -F OUTPUT").append("\n")
+//    Utils.runRootCommand(sb.toString())
+  }
+
+  def reset(context: Context) {
+    crash_recovery()
+Log.d("reindeer", "4");
+    copyAssets(context, Utils.getABI)
+    Utils.runCommand("chmod 755 /data/data/com.biganiseed.reindeer/iptables\n"
+      + "chmod 755 /data/data/com.biganiseed.reindeer/redsocks\n"
+      + "chmod 755 /data/data/com.biganiseed.reindeer/pdnsd\n"
+      + "chmod 755 /data/data/com.biganiseed.reindeer/shadowsocks\n"
+      + "chmod 755 /data/data/com.biganiseed.reindeer/tun2socks\n")
   }
 
 }
