@@ -828,11 +828,15 @@ Log.e("reindeer", ex.getMessage)
     crash_recovery()
 Log.d("reindeer", "4");
     copyAssets(context, Utils.getABI)
+    chmodAssets()
+  }
+
+  def chmodAssets(){
     Utils.runCommand("chmod 755 /data/data/com.biganiseed.reindeer/iptables\n"
       + "chmod 755 /data/data/com.biganiseed.reindeer/redsocks\n"
       + "chmod 755 /data/data/com.biganiseed.reindeer/pdnsd\n"
       + "chmod 755 /data/data/com.biganiseed.reindeer/shadowsocks\n"
       + "chmod 755 /data/data/com.biganiseed.reindeer/tun2socks\n")
   }
-
+  
 }
