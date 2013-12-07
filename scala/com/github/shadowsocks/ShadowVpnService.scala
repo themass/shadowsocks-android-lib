@@ -72,7 +72,8 @@ class ShadowVpnService extends VpnService {
   val MSG_STOP_SELF = 5
   val MSG_VPN_ERROR = 6
 
-  val VPN_MTU = 1500
+//  val VPN_MTU = 1500
+  val VPN_MTU = 1300
 
   val PRIVATE_VLAN = "26.26.26.%s"
 
