@@ -206,7 +206,7 @@ class ShadowVpnService extends VpnService {
         resolved = true
       }
 
-      if (resolved && handleConnection) {
+      if (resolved && handleConnection(intent.getStringExtra("sessionName"))) {
         handler.sendEmptyMessageDelayed(MSG_CONNECT_SUCCESS, 300)
       } else {
         notifyAlert(getString(R.string.forward_fail), getString(R.string.service_failed))
@@ -236,7 +236,7 @@ class ShadowVpnService extends VpnService {
     !t.isAlive
   }
 
-  def startVpn() {
+  def startVpn(sessionName: String) {
 
     val address = config.proxy.split('.')
     val prefix1 = address(0)
@@ -245,7 +245,8 @@ class ShadowVpnService extends VpnService {
 
     val builder = new Builder()
     builder
-      .setSession(getString(R.string.app_name))
+//      .setSession(getString(R.string.app_name))
+      .setSession(sessionName)
       .setMtu(VPN_MTU)
       .addAddress(PRIVATE_VLAN.format("1"), 24)
       .addDnsServer("8.8.8.8")
@@ -314,8 +315,8 @@ class ShadowVpnService extends VpnService {
   }
 
   /** Called when the activity is first created. */
-  def handleConnection: Boolean = {
-    startVpn()
+  def handleConnection(sessionName: String): Boolean = {
+    startVpn(sessionName)
     startShadowsocksDaemon()
     startDnsDaemon()
     true
