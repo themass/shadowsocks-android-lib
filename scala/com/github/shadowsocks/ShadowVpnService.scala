@@ -44,10 +44,10 @@ import android.content._
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os._
-import android.support.v4.app.NotificationCompat
+//import android.support.v4.app.NotificationCompat
 import android.util.Log
 
-import com.google.analytics.tracking.android.EasyTracker
+//import com.google.analytics.tracking.android.EasyTracker
 import java.io._
 import android.net.VpnService
 import org.apache.http.conn.util.InetAddressUtils
@@ -80,7 +80,7 @@ class ShadowVpnService extends VpnService {
   var conn: ParcelFileDescriptor = null
   var notificationManager: NotificationManager = null
   var receiver: BroadcastReceiver = null
-  var apps: Array[ProxiedApp] = null
+//  var apps: Array[ProxiedApp] = null
   var config: Config = null
 
   private var state = State.INIT
@@ -177,13 +177,13 @@ class ShadowVpnService extends VpnService {
       return
     }
 
-    if (VpnService.prepare(this) != null) {
-      val i = new Intent(this, classOf[ShadowVpnActivity])
-      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-      startActivity(i)
-      stopSelf()
-      return
-    }
+//    if (VpnService.prepare(this) != null) {
+//      val i = new Intent(this, classOf[ShadowVpnActivity])
+//      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//      startActivity(i)
+//      stopSelf()
+//      return
+//    }
 
     changeState(State.CONNECTING)
 
@@ -196,12 +196,12 @@ class ShadowVpnService extends VpnService {
       var resolved: Boolean = false
       if (!InetAddressUtils.isIPv4Address(config.proxy) &&
         !InetAddressUtils.isIPv6Address(config.proxy)) {
-        Utils.resolve(config.proxy, enableIPv6 = true) match {
-          case Some(addr) =>
-            config.proxy = addr
-            resolved = true
-          case None => resolved = false
-        }
+//        Utils.resolve(config.proxy, enableIPv6 = true) match {
+//          case Some(addr) =>
+//            config.proxy = addr
+//            resolved = true
+//          case None => resolved = false
+//        }
       } else {
         resolved = true
       }
@@ -209,7 +209,7 @@ class ShadowVpnService extends VpnService {
       if (resolved && handleConnection(intent.getStringExtra("sessionName"))) {
         handler.sendEmptyMessageDelayed(MSG_CONNECT_SUCCESS, 300)
       } else {
-        notifyAlert(getString(R.string.forward_fail), getString(R.string.service_failed))
+//        notifyAlert(getString(R.string.forward_fail), getString(R.string.service_failed))
         handler.sendEmptyMessageDelayed(MSG_CONNECT_FAIL, 300)
         handler.sendEmptyMessageDelayed(MSG_STOP_SELF, 500)
       }
@@ -327,21 +327,21 @@ class ShadowVpnService extends VpnService {
     notification.defaults |= Notification.DEFAULT_LIGHTS
   }
 
-  def notifyAlert(title: String, info: String) {
-    val openIntent: Intent = new Intent(this, classOf[Shadowsocks])
-    openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-    val contentIntent: PendingIntent = PendingIntent.getActivity(this, 0, openIntent, 0)
-    val builder: NotificationCompat.Builder = new NotificationCompat.Builder(this)
-    builder
-      .setSmallIcon(R.drawable.ic_stat_shadowsocks)
-      .setWhen(0)
-      .setTicker(title)
-      .setContentTitle(getString(R.string.app_name))
-      .setContentText(info)
-      .setContentIntent(contentIntent)
-      .setAutoCancel(true)
-    notificationManager.notify(1, builder.build)
-  }
+//  def notifyAlert(title: String, info: String) {
+//    val openIntent: Intent = new Intent(this, classOf[Shadowsocks])
+//    openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//    val contentIntent: PendingIntent = PendingIntent.getActivity(this, 0, openIntent, 0)
+//    val builder: NotificationCompat.Builder = new NotificationCompat.Builder(this)
+//    builder
+//      .setSmallIcon(R.drawable.ic_stat_shadowsocks)
+//      .setWhen(0)
+//      .setTicker(title)
+//      .setContentTitle(getString(R.string.app_name))
+//      .setContentText(info)
+//      .setContentIntent(contentIntent)
+//      .setAutoCancel(true)
+//    notificationManager.notify(1, builder.build)
+//  }
 
   override def onBind(intent: Intent): IBinder = {
     val action = intent.getAction
@@ -353,8 +353,8 @@ class ShadowVpnService extends VpnService {
 
   override def onCreate() {
     super.onCreate()
-    EasyTracker.getTracker.setStartSession(true)
-    EasyTracker.getTracker.sendEvent(TAG, "start", getVersionName, 0L)
+//    EasyTracker.getTracker.setStartSession(true)
+//    EasyTracker.getTracker.sendEvent(TAG, "start", getVersionName, 0L)
     notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
       .asInstanceOf[NotificationManager]
 
@@ -375,7 +375,7 @@ class ShadowVpnService extends VpnService {
     killProcesses()
 
     changeState(State.STOPPED)
-    EasyTracker.getTracker.sendEvent(TAG, "stop", getVersionName, 0L)
+//    EasyTracker.getTracker.sendEvent(TAG, "stop", getVersionName, 0L)
     if (receiver != null) {
       unregisterReceiver(receiver)
       receiver = null
@@ -389,8 +389,8 @@ class ShadowVpnService extends VpnService {
 
   /** Called when the activity is closed. */
   override def onDestroy() {
-    EasyTracker.getTracker.setStartSession(false)
-    EasyTracker.getTracker.sendEvent(TAG, "stop", getVersionName, 0L)
+//    EasyTracker.getTracker.setStartSession(false)
+//    EasyTracker.getTracker.sendEvent(TAG, "stop", getVersionName, 0L)
     destroy()
     super.onDestroy()
   }

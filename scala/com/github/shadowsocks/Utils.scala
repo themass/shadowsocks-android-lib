@@ -47,7 +47,7 @@ import java.io._
 import java.net.{UnknownHostException, InetAddress, NetworkInterface}
 import org.apache.http.conn.util.InetAddressUtils
 import scala.collection.mutable.ArrayBuffer
-import org.xbill.DNS._
+//import org.xbill.DNS._
 
 import scala.Some
 import android.graphics.{Canvas, Bitmap}
@@ -319,24 +319,24 @@ import scala.collection.JavaConversions._
     false
   }
 
-  def resolve(host: String, addrType: Int): Option[String] = {
-    val lookup = new Lookup(host, addrType)
-    val resolver = new SimpleResolver("114.114.114.114")
-    resolver.setTimeout(5)
-    lookup.setResolver(resolver)
-    val result = lookup.run()
-    if (result == null) return None
-    val records = scala.util.Random.shuffle(result.toList)
-    for (r <- records) {
-      addrType match {
-        case Type.A =>
-          return Some(r.asInstanceOf[ARecord].getAddress.getHostAddress)
-        case Type.AAAA =>
-          return Some(r.asInstanceOf[AAAARecord].getAddress.getHostAddress)
-      }
-    }
-    None
-  }
+//  def resolve(host: String, addrType: Int): Option[String] = {
+//    val lookup = new Lookup(host, addrType)
+//    val resolver = new SimpleResolver("114.114.114.114")
+//    resolver.setTimeout(5)
+//    lookup.setResolver(resolver)
+//    val result = lookup.run()
+//    if (result == null) return None
+//    val records = scala.util.Random.shuffle(result.toList)
+//    for (r <- records) {
+//      addrType match {
+//        case Type.A =>
+//          return Some(r.asInstanceOf[ARecord].getAddress.getHostAddress)
+//        case Type.AAAA =>
+//          return Some(r.asInstanceOf[AAAARecord].getAddress.getHostAddress)
+//      }
+//    }
+//    None
+//  }
 
   def resolve(host: String): Option[String] = {
     try {
@@ -347,29 +347,29 @@ import scala.collection.JavaConversions._
     }
   }
 
-  def resolve(host: String, enableIPv6: Boolean): Option[String] = {
-    if (enableIPv6 && Utils.isIPv6Support) {
-      resolve(host, Type.AAAA) match {
-        case Some(addr) => {
-          return Some(addr)
-        }
-        case None =>
-      }
-    }
-    resolve(host, Type.A) match {
-      case Some(addr) => {
-        return Some(addr)
-      }
-      case None =>
-    }
-    resolve(host) match {
-      case Some(addr) => {
-        return Some(addr)
-      }
-      case None =>
-    }
-    None
-  }
+//  def resolve(host: String, enableIPv6: Boolean): Option[String] = {
+//    if (enableIPv6 && Utils.isIPv6Support) {
+//      resolve(host, Type.AAAA) match {
+//        case Some(addr) => {
+//          return Some(addr)
+//        }
+//        case None =>
+//      }
+//    }
+//    resolve(host, Type.A) match {
+//      case Some(addr) => {
+//        return Some(addr)
+//      }
+//      case None =>
+//    }
+//    resolve(host) match {
+//      case Some(addr) => {
+//        return Some(addr)
+//      }
+//      case None =>
+//    }
+//    None
+//  }
 
   /**
    * Get local IPv4 address
@@ -759,7 +759,7 @@ import scala.collection.JavaConversions._
       files = assetManager.list(path)
     } catch {
       case e: IOException => {
-        Log.e(Shadowsocks.TAG, e.getMessage)
+//        Log.e(Shadowsocks.TAG, e.getMessage)
       }
     }
  Log.d("reindeer", path);
@@ -785,7 +785,7 @@ Log.d("reindeer", "4.5");
           out = null
         } catch {
           case ex: Exception => {
-            Log.e(Shadowsocks.TAG, ex.getMessage)
+//            Log.e(Shadowsocks.TAG, ex.getMessage)
 Log.e("reindeer", ex.getMessage)
           }
         }
