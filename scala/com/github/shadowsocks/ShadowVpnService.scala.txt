@@ -46,19 +46,14 @@ import android.content.pm.PackageManager
 import android.os._
 //import android.support.v4.app.NotificationCompat
 import android.util.Log
-//import com.google.analytics.tracking.android.{Fields, MapBuilder, EasyTracker}
+
+//import com.google.analytics.tracking.android.EasyTracker
 import java.io._
 import android.net.VpnService
 import org.apache.http.conn.util.InetAddressUtils
 import android.os.Message
 import scala.Some
 import scala.concurrent.ops._
-import org.apache.commons.net.util.SubnetUtils
-import java.net.InetAddress
-import com.github.shadowsocks.utils._
-import scala.Some
-//import com.github.shadowsocks.ProxiedApp
-
 
 object ShadowVpnService {
   def isServiceStarted(context: Context): Boolean = {
@@ -77,7 +72,8 @@ class ShadowVpnService extends VpnService {
   val MSG_STOP_SELF = 5
   val MSG_VPN_ERROR = 6
 
-  val VPN_MTU = 1500
+//  val VPN_MTU = 1500
+  val VPN_MTU = 1300
 
   val PRIVATE_VLAN = "26.26.26.%s"
 
@@ -145,7 +141,8 @@ class ShadowVpnService extends VpnService {
   def startShadowsocksDaemon() {
     val cmd: String = (BASE +
       "shadowsocks -b 127.0.0.1 -s \"%s\" -p \"%d\" -l \"%d\" -k \"%s\" -m \"%s\" -f " +
-      BASE + "shadowsocks.pid")
+      BASE +
+      "shadowsocks.pid")
       .format(config.proxy, config.remotePort, config.localPort, config.sitekey, config.encMethod)
     if (SSBuildConfig.DEBUG) Log.d(TAG, cmd)
     System.exec(cmd)
@@ -180,50 +177,36 @@ class ShadowVpnService extends VpnService {
       return
     }
 
-    if (VpnService.prepare(this) != null) {
+//    if (VpnService.prepare(this) != null) {
 //      val i = new Intent(this, classOf[ShadowVpnActivity])
 //      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 //      startActivity(i)
-      stopSelf()
-      return
-    }
+//      stopSelf()
+//      return
+//    }
 
     changeState(State.CONNECTING)
 
     config = Extra.get(intent)
 
     spawn {
-//      if (config.proxy == "198.199.101.152") {
-//        val container = getApplication.asInstanceOf[ShadowsocksApplication].tagContainer
-//        try {
-//          config = Config.getPublicConfig(getBaseContext, container, config)
-//        } catch {
-//          case ex: Exception => {
-//            notifyAlert(getString(R.string.forward_fail), getString(R.string.service_failed))
-//            stopSelf()
-//            handler.sendEmptyMessageDelayed(MSG_CONNECT_FAIL, 500)
-//            return
-//          }
-//        }
-//      }
-
       killProcesses()
 
       // Resolve server address
       var resolved: Boolean = false
       if (!InetAddressUtils.isIPv4Address(config.proxy) &&
         !InetAddressUtils.isIPv6Address(config.proxy)) {
-        Utils.resolve(config.proxy, enableIPv6 = true) match {
-          case Some(addr) =>
-            config.proxy = addr
-            resolved = true
-          case None => resolved = false
-        }
+//        Utils.resolve(config.proxy, enableIPv6 = true) match {
+//          case Some(addr) =>
+//            config.proxy = addr
+//            resolved = true
+//          case None => resolved = false
+//        }
       } else {
         resolved = true
       }
 
-      if (resolved && handleConnection) {
+      if (resolved && handleConnection(intent.getStringExtra("sessionName"))) {
         handler.sendEmptyMessageDelayed(MSG_CONNECT_SUCCESS, 300)
       } else {
 //        notifyAlert(getString(R.string.forward_fail), getString(R.string.service_failed))
@@ -253,13 +236,17 @@ class ShadowVpnService extends VpnService {
     !t.isAlive
   }
 
-  def startVpn() {
+  def startVpn(sessionName: String) {
 
-    val proxy_address = config.proxy
+    val address = config.proxy.split('.')
+    val prefix1 = address(0)
+    val prefix2 = address.slice(0, 2).mkString(".")
+    val prefix3 = address.slice(0, 3).mkString(".")
 
     val builder = new Builder()
     builder
-      .setSession(config.profileName)
+//      .setSession(getString(R.string.app_name))
+      .setSession(sessionName)
       .setMtu(VPN_MTU)
       .addAddress(PRIVATE_VLAN.format("1"), 24)
       .addDnsServer("8.8.8.8")
@@ -267,48 +254,31 @@ class ShadowVpnService extends VpnService {
     if (InetAddressUtils.isIPv6Address(config.proxy)) {
       builder.addRoute("0.0.0.0", 0)
     } else if (config.isGFWList) {
-      val gfwList = {
-        if (Build.VERSION.SDK_INT == 19) {
-          getResources.getStringArray(R.array.simple_list)
+      val gfwList = getResources.getStringArray(R.array.gfw_list)
+      gfwList.foreach(addr =>
+        if (addr != prefix2) {
+          builder.addRoute(addr + ".0.0", 16)
         } else {
-          getResources.getStringArray(R.array.gfw_list)
-        }
-      }
-      gfwList.foreach(cidr => {
-        val net = new SubnetUtils(cidr).getInfo
-        if (!net.isInRange(proxy_address)) {
-          val addr = cidr.split('/')
-          builder.addRoute(addr(0), addr(1).toInt)
-        }
-      })
+          for (i <- 0 to 255) {
+            val prefix = Array(addr, i.toString).mkString(".")
+            if (prefix != prefix3) builder.addRoute(prefix + ".0", 24)
+          }
+        })
     } else {
       for (i <- 1 to 254) {
-        if (i != 26 && i != 127) {
-          val addr = i.toString + ".0.0.0"
-          val cidr = addr + "/8"
-          val net = new SubnetUtils(cidr).getInfo
-
-          if (!net.isInRange(proxy_address)) {
-            if (!InetAddress.getByName(addr).isSiteLocalAddress) {
-              builder.addRoute(addr, 8)
-            }
-          } else {
-            for (j <- 0 to 255) {
-              val subAddr = i.toString + "." + j.toString + ".0.0"
-              val subCidr = subAddr + "/16"
-              val subNet = new SubnetUtils(subCidr).getInfo
-              if (!subNet.isInRange(proxy_address)) {
-                if (!InetAddress.getByName(subAddr).isSiteLocalAddress) {
-                  builder.addRoute(subAddr, 16)
-                }
-              }
-            }
+        if (i != 127 && i != 172 && i != 192 && i != 10 && i.toString != prefix1) {
+          builder.addRoute(i + ".0.0.0", 8)
+        } else if (i.toString == prefix1) {
+          for (j <- 0 to 255) {
+            val prefix = Array(i.toString, j.toString).mkString(".")
+            if (prefix != prefix2) builder.addRoute(prefix + ".0.0", 16)
           }
         }
       }
     }
 
     builder.addRoute("8.8.0.0", 16)
+    builder.addRoute("208.67.0.0", 16)
 
     try {
       conn = builder.establish()
@@ -339,15 +309,14 @@ class ShadowVpnService extends VpnService {
       + "--tunmtu %d "
       + "--loglevel 3 "
       + "--pid %stun2socks.pid")
-      .format(PRIVATE_VLAN.format("2"), PRIVATE_VLAN.format("1"), config.localPort, fd, VPN_MTU,
-      BASE)
+      .format(PRIVATE_VLAN.format("2"), PRIVATE_VLAN.format("1"), config.localPort, fd, VPN_MTU, BASE)
     if (SSBuildConfig.DEBUG) Log.d(TAG, cmd)
     System.exec(cmd)
   }
 
   /** Called when the activity is first created. */
-  def handleConnection: Boolean = {
-    startVpn()
+  def handleConnection(sessionName: String): Boolean = {
+    startVpn(sessionName)
     startShadowsocksDaemon()
     startDnsDaemon()
     true
@@ -384,16 +353,8 @@ class ShadowVpnService extends VpnService {
 
   override def onCreate() {
     super.onCreate()
-
-//    Config.refresh(this)
-//
-//    EasyTracker
-//      .getInstance(this)
-//      .send(MapBuilder
-//      .createEvent(TAG, "start", getVersionName, 0L)
-//      .set(Fields.SESSION_CONTROL, "start")
-//      .build())
-
+//    EasyTracker.getTracker.setStartSession(true)
+//    EasyTracker.getTracker.sendEvent(TAG, "start", getVersionName, 0L)
     notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
       .asInstanceOf[NotificationManager]
 
@@ -414,14 +375,7 @@ class ShadowVpnService extends VpnService {
     killProcesses()
 
     changeState(State.STOPPED)
-
-//    EasyTracker
-//      .getInstance(this)
-//      .send(MapBuilder
-//      .createEvent(TAG, "stop", getVersionName, 0L)
-//      .set(Fields.SESSION_CONTROL, "stop")
-//      .build())
-
+//    EasyTracker.getTracker.sendEvent(TAG, "stop", getVersionName, 0L)
     if (receiver != null) {
       unregisterReceiver(receiver)
       receiver = null
@@ -435,6 +389,8 @@ class ShadowVpnService extends VpnService {
 
   /** Called when the activity is closed. */
   override def onDestroy() {
+//    EasyTracker.getTracker.setStartSession(false)
+//    EasyTracker.getTracker.sendEvent(TAG, "stop", getVersionName, 0L)
     destroy()
     super.onDestroy()
   }
