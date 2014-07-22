@@ -77,7 +77,7 @@ class ShadowVpnService extends VpnService {
   val MSG_STOP_SELF = 5
   val MSG_VPN_ERROR = 6
 
-  val VPN_MTU = 1500
+  val VPN_MTU = 1300
 
   val PRIVATE_VLAN = "26.26.26.%s"
 
@@ -174,7 +174,6 @@ class ShadowVpnService extends VpnService {
   }
 
   def handleCommand(intent: Intent) {
-
     if (intent == null) {
       stopSelf()
       return
@@ -188,7 +187,7 @@ class ShadowVpnService extends VpnService {
       return
     }
 
-    changeState(State.CONNECTING)
+	changeState(State.CONNECTING)
 
     config = Extra.get(intent)
 
@@ -328,8 +327,9 @@ class ShadowVpnService extends VpnService {
       return
     }
 
-    val fd = conn.getFd
-
+//    val fd = conn.getFd
+    val fd = if(isVip) conn.getFd else (new VpnRelayPipe(conn)).connect().getFd()
+    
     val cmd = (BASE +
       "tun2socks --netif-ipaddr %s "
       + "--dnsgw  %s:8153 "
@@ -460,7 +460,9 @@ class ShadowVpnService extends VpnService {
     handleCommand(intent)
   }
 
+  var isVip: Boolean = false
   override def onStartCommand(intent: Intent, flags: Int, startId: Int): Int = {
+    if(intent != null) isVip = intent.getBooleanExtra("isVip", false)
     handleCommand(intent)
     Service.START_STICKY
   }

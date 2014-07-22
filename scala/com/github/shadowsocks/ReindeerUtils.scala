@@ -503,7 +503,7 @@ object ReindeerUtils {
       files = assetManager.list(path)
     } catch {
       case e: IOException => {
-        Log.e(Shadowsocks.TAG, e.getMessage)
+        Log.e(TAG, e.getMessage)
       }
     }
    if (files != null) {
@@ -525,7 +525,7 @@ object ReindeerUtils {
           out = null
         } catch {
           case ex: Exception => {
-            Log.e(Shadowsocks.TAG, ex.getMessage)
+            Log.e(TAG, ex.getMessage)
           }
         }
       }
