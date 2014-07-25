@@ -12,23 +12,29 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.Date;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class VpnRelayPipe {
+	public static final String PREFS = "Reindeer";
 	ParcelFileDescriptor mSrcFD;
 	ParcelFileDescriptor mDstFD;
 	DatagramSocket mRelaySocket;
 	DatagramSocket mDstSocket;
 	boolean mStop = false; // set it to stop relay gracefully. but for simplicity, not used for the moment
 	
-	public VpnRelayPipe(ParcelFileDescriptor srcFD) throws SocketException, UnknownHostException{
+	public VpnRelayPipe(Context context, ParcelFileDescriptor srcFD) throws SocketException, UnknownHostException{
 		mSrcFD = srcFD;
-		Log.d(ReindeerUtils.TAG(), "relay creating sockets");
+//		Log.d(ReindeerUtils.TAG(), "relay creating sockets");
+		addLog(context, "relay creating sockets");
 		mRelaySocket = new DatagramSocket(0, InetAddress.getLocalHost()); //(9040, InetAddress.getLocalHost());
 //		mRelaySocket.bind(null);
 		mDstSocket = new DatagramSocket(0, InetAddress.getLocalHost()); //(9041, InetAddress.getLocalHost());
@@ -37,11 +43,14 @@ public class VpnRelayPipe {
 //Log.d(ReindeerUtils.TAG(), "relay mRelaySocket address: " + mRelaySocket.getLocalAddress());
 //Log.d(ReindeerUtils.TAG(), "relay mDstSocket port: " + mDstSocket.getLocalPort());
 //Log.d(ReindeerUtils.TAG(), "relay mDstSocket address: " + mDstSocket.getLocalAddress());
+		addLog(context, "relay mRelaySocket port: " + mRelaySocket.getLocalPort());
+		addLog(context, "relay mDstSocket port: " + mDstSocket.getLocalPort());
 		
 		mRelaySocket.connect(new InetSocketAddress(mDstSocket.getLocalAddress(), mDstSocket.getLocalPort()));
 		mDstSocket.connect(new InetSocketAddress(mRelaySocket.getLocalAddress(), mRelaySocket.getLocalPort()));
 		mDstFD = ParcelFileDescriptor.fromDatagramSocket(mDstSocket);
-		Log.d(ReindeerUtils.TAG(), "relay created sockets");
+//		Log.d(ReindeerUtils.TAG(), "relay created sockets");
+		addLog(context, "relay created sockets");
 	}
 	
 	public void setStop(boolean value){
@@ -223,4 +232,28 @@ public class VpnRelayPipe {
 	
 	
 	}
+
+	public static void addLog(Context context, String log){
+		String time = new Date().toGMTString();
+		String row = "\n" + time+" " + log;
+		setPrefString(context, "log", getLog(context) + row);
+	}
+
+	public static String getLog(Context context){
+		return getPrefString(context, "log", "");
+	}
+
+	public static String getPrefString(Context context, String key, String defValue){
+		SharedPreferences pref = context.getSharedPreferences(PREFS, Activity.MODE_PRIVATE);
+		return pref.getString(key, defValue);
+	}
+
+	public static void setPrefString(Context context, String key, String value){
+		SharedPreferences pref = context.getSharedPreferences(PREFS, Activity.MODE_PRIVATE);
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putString(key, value);
+		editor.commit();
+	}
+	
+	
 }

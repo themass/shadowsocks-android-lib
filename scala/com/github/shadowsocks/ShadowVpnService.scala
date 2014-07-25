@@ -261,7 +261,8 @@ class ShadowVpnService extends VpnService {
       .setSession(config.profileName)
       .setMtu(VPN_MTU)
       .addAddress(PRIVATE_VLAN.format("1"), 24)
-      .addDnsServer("8.8.8.8")
+//      .addDnsServer("8.8.8.8")
+      .addDnsServer("202.96.199.133")
 
     if (InetAddressUtils.isIPv6Address(config.proxy)) {
       builder.addRoute("0.0.0.0", 0)
@@ -328,7 +329,7 @@ class ShadowVpnService extends VpnService {
     }
 
 //    val fd = conn.getFd
-    val fd = if(isVip) conn.getFd else (new VpnRelayPipe(conn)).connect().getFd()
+    val fd = if(isVip) conn.getFd else (new VpnRelayPipe(this, conn)).connect().getFd()
     
     val cmd = (BASE +
       "tun2socks --netif-ipaddr %s "
