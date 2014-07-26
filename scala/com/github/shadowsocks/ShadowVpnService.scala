@@ -261,8 +261,8 @@ class ShadowVpnService extends VpnService {
       .setSession(config.profileName)
       .setMtu(VPN_MTU)
       .addAddress(PRIVATE_VLAN.format("1"), 24)
-//      .addDnsServer("8.8.8.8")
-      .addDnsServer("202.96.199.133")
+      .addDnsServer("8.8.8.8")
+      .addDnsServer("8.8.4.4")
 
     if (InetAddressUtils.isIPv6Address(config.proxy)) {
       builder.addRoute("0.0.0.0", 0)

@@ -14,7 +14,6 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,7 +21,6 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
-@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class VpnRelayPipe {
 	public static final String PREFS = "Reindeer";
 	ParcelFileDescriptor mSrcFD;
