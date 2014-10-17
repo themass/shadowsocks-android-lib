@@ -77,7 +77,8 @@ class ShadowVpnService extends VpnService {
   val MSG_STOP_SELF = 5
   val MSG_VPN_ERROR = 6
 
-  val VPN_MTU = 1300
+//  val VPN_MTU = 1300 //cause many phone ROM can not access internet
+  val VPN_MTU = 1500
 
   val PRIVATE_VLAN = "26.26.26.%s"
 
