@@ -61,9 +61,9 @@ import scala.Some
 
 
 object ShadowVpnService {
-  def isServiceStarted(context: Context): Boolean = {
-    Utils.isServiceStarted("com.github.shadowsocks.ShadowVpnService", context)
-  }
+//  def isServiceStarted(context: Context): Boolean = {
+//    Utils.isServiceStarted("com.github.shadowsocks.ShadowVpnService", context)
+//  }
   var base: String = null 
   def setBase(value: String) {
     base = value;
