@@ -64,12 +64,22 @@ object ShadowVpnService {
   def isServiceStarted(context: Context): Boolean = {
     Utils.isServiceStarted("com.github.shadowsocks.ShadowVpnService", context)
   }
+  var base: String = null 
+  def setBase(value: String) {
+    base = value;
+  }
+
+  def getBase(): String = {
+    assert(base != null, "Must set base with the package path before start the service")
+    base
+  }
+
 }
 
 class ShadowVpnService extends VpnService {
 
   val TAG = "ShadowVpnService"
-  val BASE = "/data/data/com.biganiseed.reindeer/"
+//  val BASE = "/data/data/com.biganiseed.reindeer/"
 
   val MSG_CONNECT_FINISH = 1
   val MSG_CONNECT_SUCCESS = 2
@@ -126,7 +136,7 @@ class ShadowVpnService extends VpnService {
 
   def getPid(name: String): Int = {
     try {
-      val reader: BufferedReader = new BufferedReader(new FileReader(BASE + name + ".pid"))
+      val reader: BufferedReader = new BufferedReader(new FileReader(ShadowVpnService.getBase + name + ".pid"))
       val line = reader.readLine
       return Integer.valueOf(line)
     } catch {
@@ -144,18 +154,18 @@ class ShadowVpnService extends VpnService {
   }
 
   def startShadowsocksDaemon() {
-    val cmd: String = (BASE +
+    val cmd: String = (ShadowVpnService.getBase +
       "shadowsocks -b 127.0.0.1 -s \"%s\" -p \"%d\" -l \"%d\" -k \"%s\" -m \"%s\" -f " +
-      BASE + "shadowsocks.pid")
+      ShadowVpnService.getBase + "shadowsocks.pid")
       .format(config.proxy, config.remotePort, config.localPort, config.sitekey, config.encMethod)
     if (SSBuildConfig.DEBUG) Log.d(TAG, cmd)
     System.exec(cmd)
   }
 
   def startDnsDaemon() {
-    val cmd: String = BASE + "pdnsd -c " + BASE + "pdnsd.conf"
-    val conf: String = Config.PDNSD.format("0.0.0.0")
-    Config.printToFile(new File(BASE + "pdnsd.conf"))(p => {
+    val cmd: String = ShadowVpnService.getBase + "pdnsd -c " + ShadowVpnService.getBase + "pdnsd.conf"
+    val conf: String = Config.PDNSD.format(ShadowVpnService.getBase, "0.0.0.0", ShadowVpnService.getBase + "pdnsd.pid")
+    Config.printToFile(new File(ShadowVpnService.getBase + "pdnsd.conf"))(p => {
       p.println(conf)
     })
     Utils.runCommand(cmd)
@@ -332,7 +342,7 @@ class ShadowVpnService extends VpnService {
 //    val fd = conn.getFd
     val fd = if(isVip) conn.getFd else (new VpnRelayPipe(this, conn)).connect().getFd()
     
-    val cmd = (BASE +
+    val cmd = (ShadowVpnService.getBase +
       "tun2socks --netif-ipaddr %s "
       + "--dnsgw  %s:8153 "
       + "--netif-netmask 255.255.255.0 "
@@ -342,7 +352,7 @@ class ShadowVpnService extends VpnService {
       + "--loglevel 3 "
       + "--pid %stun2socks.pid")
       .format(PRIVATE_VLAN.format("2"), PRIVATE_VLAN.format("1"), config.localPort, fd, VPN_MTU,
-      BASE)
+      ShadowVpnService.getBase)
     if (SSBuildConfig.DEBUG) Log.d(TAG, cmd)
     System.exec(cmd)
   }
@@ -444,15 +454,15 @@ class ShadowVpnService extends VpnService {
   def killProcesses() {
     val sb = new StringBuilder
     if (!waitForProcess("shadowsocks")) {
-      sb ++= "kill -9 `cat /data/data/com.biganiseed.reindeer/shadowsocks.pid`" ++= "\n"
+      sb ++= "kill -9 `cat " + ShadowVpnService.getBase + "shadowsocks.pid`" ++= "\n"
       sb ++= "killall -9 shadowsocks" ++= "\n"
     }
     if (!waitForProcess("tun2socks")) {
-      sb ++= "kill -9 `cat /data/data/com.biganiseed.reindeer/tun2socks.pid`" ++= "\n"
+      sb ++= "kill -9 `cat " + ShadowVpnService.getBase + "tun2socks.pid`" ++= "\n"
       sb ++= "killall -9 tun2socks" ++= "\n"
     }
     if (!waitForProcess("pdnsd")) {
-      sb ++= "kill -9 `cat /data/data/com.biganiseed.reindeer/pdnsd.pid`" ++= "\n"
+      sb ++= "kill -9 `cat " + ShadowVpnService.getBase + "pdnsd.pid`" ++= "\n"
       sb ++= "killall -9 pdnsd" ++= "\n"
     }
     Utils.runCommand(sb.toString())

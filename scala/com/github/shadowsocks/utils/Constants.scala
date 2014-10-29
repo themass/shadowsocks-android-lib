@@ -41,10 +41,10 @@ object State {
 }
 
 object Action {
-  val CLOSE = "com.biganiseed.reindeer.ACTION_SHUTDOWN"
-  val UPDATE_STATE = "com.biganiseed.reindeer.ACTION_UPDATE_STATE"
-  val UPDATE_FRAGMENT = "com.biganiseed.reindeer.ACTION_UPDATE_FRAGMENT"
-  val UPDATE_PREFS = "com.biganiseed.reindeer.ACTION_UPDATE_PREFS"
+  val CLOSE = "com.biganiseed.shadowsocks.ACTION_SHUTDOWN"
+  val UPDATE_STATE = "com.biganiseed.shadowsocks.ACTION_UPDATE_STATE"
+  val UPDATE_FRAGMENT = "com.biganiseed.shadowsocks.ACTION_UPDATE_FRAGMENT"
+  val UPDATE_PREFS = "com.biganiseed.shadowsocks.ACTION_UPDATE_PREFS"
 }
 
 object Extra {

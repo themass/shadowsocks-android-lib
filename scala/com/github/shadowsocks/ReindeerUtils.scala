@@ -496,7 +496,7 @@ object ReindeerUtils {
     }
   }
   
-  def copyAssets(context: Context, path: String) {
+  def copyAssets(context: Context, execPath: String, path: String) {
     val assetManager: AssetManager = context.getAssets
     var files: Array[String] = null
     try {
@@ -516,7 +516,7 @@ object ReindeerUtils {
           } else {
             in = assetManager.open(file)
           }
-          out = new FileOutputStream("/data/data/com.biganiseed.reindeer/" + file)
+          out = new FileOutputStream(execPath + file)
           copyFile(in, out)
           in.close()
           in = null
@@ -543,16 +543,16 @@ object ReindeerUtils {
     }
   }
 
-  def crash_recovery() {
+  def crash_recovery(execPath: String) {
     val sb = new StringBuilder
 
-    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/pdnsd.pid`").append("\n")
-    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/shadowsocks.pid`").append("\n")
-    sb.append("kill -9 `cat /data/data/com.biganiseed.reindeer/tun2socks.pid`").append("\n")
+    sb.append("kill -9 `cat "+ execPath + "pdnsd.pid`").append("\n")
+    sb.append("kill -9 `cat "+ execPath + "shadowsocks.pid`").append("\n")
+    sb.append("kill -9 `cat "+ execPath + "tun2socks.pid`").append("\n")
     sb.append("killall -9 pdnsd").append("\n")
     sb.append("killall -9 shadowsocks").append("\n")
     sb.append("killall -9 tun2socks").append("\n")
-    sb.append("rm /data/data/com.biganiseed.reindeer/pdnsd.conf").append("\n")
+    sb.append("rm "+ execPath + "pdnsd.conf").append("\n")
     ReindeerUtils.runCommand(sb.toString())
 
 //    sb.clear()
@@ -563,18 +563,18 @@ object ReindeerUtils {
 //    Utils.runRootCommand(sb.toString())
   }
 
-  def reset(context: Context) {
-    crash_recovery()
-    copyAssets(context, ReindeerUtils.getABI)
-    chmodAssets()
+  def reset(context: Context, execPath: String) {
+    crash_recovery(execPath)
+    copyAssets(context, execPath, ReindeerUtils.getABI)
+    chmodAssets(execPath)
   }
 
-  def chmodAssets(){
-    ReindeerUtils.runCommand("chmod 755 /data/data/com.biganiseed.reindeer/iptables\n"
-      + "chmod 755 /data/data/com.biganiseed.reindeer/redsocks\n"
-      + "chmod 755 /data/data/com.biganiseed.reindeer/pdnsd\n"
-      + "chmod 755 /data/data/com.biganiseed.reindeer/shadowsocks\n"
-      + "chmod 755 /data/data/com.biganiseed.reindeer/tun2socks\n")
+  def chmodAssets(execPath: String){
+    ReindeerUtils.runCommand("chmod 755 " + execPath + "iptables\n"
+      + "chmod 755 " + execPath + "redsocks\n"
+      + "chmod 755 " + execPath + "pdnsd\n"
+      + "chmod 755 " + execPath + "shadowsocks\n"
+      + "chmod 755 " + execPath + "tun2socks\n")
   }
   
 }

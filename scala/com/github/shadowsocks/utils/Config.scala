@@ -25,7 +25,7 @@ object Config {
     """
       |global {
       | perm_cache = 2048;
-      | cache_dir = "/data/data/com.biganiseed.reindeer";
+      | cache_dir = %s;
       | server_ip = %s;
       | server_port = 8153;
       | query_method = tcp_only;
@@ -34,7 +34,7 @@ object Config {
       | max_ttl = 1w;
       | timeout = 10;
       | daemon = on;
-      | pid_file = "/data/data/com.biganiseed.reindeer/pdnsd.pid";
+      | pid_file = %s;
       |}
       |
       |server {
