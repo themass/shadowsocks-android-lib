@@ -64,15 +64,15 @@ object ShadowVpnService {
 //  def isServiceStarted(context: Context): Boolean = {
 //    Utils.isServiceStarted("com.github.shadowsocks.ShadowVpnService", context)
 //  }
-  var base: String = null 
-  def setBase(value: String) {
-    base = value;
-  }
-
-  def getBase(): String = {
-    assert(base != null, "Must set base with the package path before start the service")
-    base
-  }
+//  var base: String = null 
+//  def setBase(value: String) {
+//    base = value;
+//  }
+//
+//  def getBaseDir(): String = {
+//    assert(base != null, "Must set base with the package path before start the service")
+//    base
+//  }
 
 }
 
@@ -100,6 +100,12 @@ class ShadowVpnService extends VpnService {
 
   private var state = State.INIT
   private var message: String = null
+
+  var base: String = null 
+  def getBase(): String = {
+    if (base == null) base = ReindeerUtils.getExecPath(getApplication())
+    base
+  }
 
   def changeState(s: Int) {
     changeState(s, null)
@@ -136,7 +142,7 @@ class ShadowVpnService extends VpnService {
 
   def getPid(name: String): Int = {
     try {
-      val reader: BufferedReader = new BufferedReader(new FileReader(ShadowVpnService.getBase + name + ".pid"))
+      val reader: BufferedReader = new BufferedReader(new FileReader(getBase + name + ".pid"))
       val line = reader.readLine
       return Integer.valueOf(line)
     } catch {
@@ -154,18 +160,18 @@ class ShadowVpnService extends VpnService {
   }
 
   def startShadowsocksDaemon() {
-    val cmd: String = (ShadowVpnService.getBase +
+    val cmd: String = (getBase +
       "shadowsocks -b 127.0.0.1 -s \"%s\" -p \"%d\" -l \"%d\" -k \"%s\" -m \"%s\" -f " +
-      ShadowVpnService.getBase + "shadowsocks.pid")
+      getBase + "shadowsocks.pid")
       .format(config.proxy, config.remotePort, config.localPort, config.sitekey, config.encMethod)
     if (SSBuildConfig.DEBUG) Log.d(TAG, cmd)
     System.exec(cmd)
   }
 
   def startDnsDaemon() {
-    val cmd: String = ShadowVpnService.getBase + "pdnsd -c " + ShadowVpnService.getBase + "pdnsd.conf"
-    val conf: String = Config.PDNSD.format(ShadowVpnService.getBase, "0.0.0.0", ShadowVpnService.getBase + "pdnsd.pid")
-    Config.printToFile(new File(ShadowVpnService.getBase + "pdnsd.conf"))(p => {
+    val cmd: String = getBase + "pdnsd -c " + getBase + "pdnsd.conf"
+    val conf: String = Config.PDNSD.format(getBase, "0.0.0.0", getBase + "pdnsd.pid")
+    Config.printToFile(new File(getBase + "pdnsd.conf"))(p => {
       p.println(conf)
     })
     Utils.runCommand(cmd)
@@ -342,7 +348,7 @@ class ShadowVpnService extends VpnService {
 //    val fd = conn.getFd
     val fd = if(isVip) conn.getFd else (new VpnRelayPipe(this, conn)).connect().getFd()
     
-    val cmd = (ShadowVpnService.getBase +
+    val cmd = (getBase +
       "tun2socks --netif-ipaddr %s "
       + "--dnsgw  %s:8153 "
       + "--netif-netmask 255.255.255.0 "
@@ -352,7 +358,7 @@ class ShadowVpnService extends VpnService {
       + "--loglevel 3 "
       + "--pid %stun2socks.pid")
       .format(PRIVATE_VLAN.format("2"), PRIVATE_VLAN.format("1"), config.localPort, fd, VPN_MTU,
-      ShadowVpnService.getBase)
+      getBase)
     if (SSBuildConfig.DEBUG) Log.d(TAG, cmd)
     System.exec(cmd)
   }
@@ -454,15 +460,15 @@ class ShadowVpnService extends VpnService {
   def killProcesses() {
     val sb = new StringBuilder
     if (!waitForProcess("shadowsocks")) {
-      sb ++= "kill -9 `cat " + ShadowVpnService.getBase + "shadowsocks.pid`" ++= "\n"
+      sb ++= "kill -9 `cat " + getBase + "shadowsocks.pid`" ++= "\n"
       sb ++= "killall -9 shadowsocks" ++= "\n"
     }
     if (!waitForProcess("tun2socks")) {
-      sb ++= "kill -9 `cat " + ShadowVpnService.getBase + "tun2socks.pid`" ++= "\n"
+      sb ++= "kill -9 `cat " + getBase + "tun2socks.pid`" ++= "\n"
       sb ++= "killall -9 tun2socks" ++= "\n"
     }
     if (!waitForProcess("pdnsd")) {
-      sb ++= "kill -9 `cat " + ShadowVpnService.getBase + "pdnsd.pid`" ++= "\n"
+      sb ++= "kill -9 `cat " + getBase + "pdnsd.pid`" ++= "\n"
       sb ++= "killall -9 pdnsd" ++= "\n"
     }
     Utils.runCommand(sb.toString())

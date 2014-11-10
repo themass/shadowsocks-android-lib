@@ -563,11 +563,11 @@ object ReindeerUtils {
 //    Utils.runRootCommand(sb.toString())
   }
 
-  def reset(context: Context, execPath: String) {
-    crash_recovery(execPath)
-    copyAssets(context, execPath, ReindeerUtils.getABI)
-    chmodAssets(execPath)
-  }
+//  def reset(context: Context, execPath: String) {
+//    crash_recovery(execPath)
+//    copyAssets(context, execPath, ReindeerUtils.getABI)
+//    chmodAssets(execPath)
+//  }
 
   def chmodAssets(execPath: String){
     ReindeerUtils.runCommand("chmod 755 " + execPath + "iptables\n"
@@ -577,4 +577,7 @@ object ReindeerUtils {
       + "chmod 755 " + execPath + "tun2socks\n")
   }
   
+  def getExecPath(app: android.app.Application): String = {
+    app.getDir("exec", 0).getAbsolutePath() + "/";
+  }
 }
