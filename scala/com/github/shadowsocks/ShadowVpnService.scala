@@ -196,13 +196,13 @@ class ShadowVpnService extends VpnService {
       return
     }
 
-    if (VpnService.prepare(this) != null) {
-//      val i = new Intent(this, classOf[ShadowVpnActivity])
-//      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//      startActivity(i)
-      stopSelf()
-      return
-    }
+//    if (VpnService.prepare(this) != null) {
+////      val i = new Intent(this, classOf[ShadowVpnActivity])
+////      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+////      startActivity(i)
+//      stopSelf()
+//      return
+//    }
 
 	changeState(State.CONNECTING)
 
@@ -419,10 +419,10 @@ class ShadowVpnService extends VpnService {
     val filter = new IntentFilter()
     filter.addAction(Intent.ACTION_SHUTDOWN)
     filter.addAction(Action.CLOSE)
-    receiver = new BroadcastReceiver {
+    if(receiver == null) receiver = new BroadcastReceiver {
       def onReceive(p1: Context, p2: Intent) {
-        destroy()
-        stopSelf()
+    	  destroy()
+    	  stopSelf()
       }
     }
     registerReceiver(receiver, filter)
@@ -440,10 +440,10 @@ class ShadowVpnService extends VpnService {
 //      .set(Fields.SESSION_CONTROL, "stop")
 //      .build())
 
-    if (receiver != null) {
-      unregisterReceiver(receiver)
-      receiver = null
-    }
+//    if (receiver != null) {
+//      unregisterReceiver(receiver)
+//      receiver = null
+//    }
     if (conn != null) {
       conn.close()
       conn = null
